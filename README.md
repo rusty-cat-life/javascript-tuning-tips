@@ -34,9 +34,18 @@ shouldComponentUpdateはnextPropsとnextStateを引数に取ります。
 ネストしたプロパティまでは比較できていません。  
 結果、shallow-equalとshouldComponentUpdateの組み合わせでは上手くいかないパターンが発生しえます。  
 （このあたりはオブジェクトの設計のルール決めで2段階以上のprops, stateは作成しないという方針でもカバーできますが、  
-技術者のレベルが玉石混淆であること、propsがバケツリレーになりがちな観点から現実的には難しいと感じでいます。）
+技術者のレベルが玉石混淆であること、propsがバケツリレーになりがちな観点から現実的には難しいと感じています。）
 
 よって、**deep-equal**を使用します。  
 deep-equalはshallow-equalより低速であるというデメリットはありますが、  
 再帰的にネストしたプロパティまで比較してくれるのが特徴です。  
-deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳っている[fast-deep-equal]((https://github.com/epoberezkin/fast-deep-equal))を選定しました。
+deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳っている[fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal)を選定しました。
+
+```javascript
+import equal from 'fast-deep-equal'
+
+/* snip */
+shouldComponentUpdate(nextProps, nextState) {
+  return !equal(this.props, nextProps) || !equal(this.state, nextState)
+}
+```
