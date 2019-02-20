@@ -61,15 +61,15 @@ DOMの再レンダが頻繁に行われるアプリケーション（証券系�
 
 - インライン展開
 
-関数を呼び出す際に、関数側のコードを関数の呼び出し側に展開する手法です。  
+関数の呼び出しに変えて、関数側のコードを関数の呼び出し側に展開する手法です。  
 本来はコンパイラの最適化の手法ですが、JavaScriptにおいても効果を発揮します。
 
 下記コードをブラウザのコンソール上で実行してみてください。
 
 ```js
-const time0 = performance.now()
-
 function powManyTimes (x) { return x * x * x * x * x * x * x * x * x * x * x * x * x  }
+
+const time0 = performance.now()
 
 for (let i = 0; i < 100000; i++) {
   powManyTimes(i)
