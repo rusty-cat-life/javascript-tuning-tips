@@ -51,8 +51,41 @@ shouldComponentUpdate(nextProps, nextState) {
 ```
 
 - react-virtualized
-執筆中
+
+画面表示範囲外のDOMを描画しないことにより、DOMの再レンダコストを下げるライブラリです。  
+DOMの再レンダが頻繁に行われるアプリケーション（証券系、カレンダー、スプレッドシートetc...）で効果を発揮します。
+
+詳細は[githubのレポジトリ](https://github.com/bvaughn/react-virtualized)を参照ください。
 
 ### Vanilla JS
 
 - インライン展開
+
+関数を呼び出す際に、関数側のコードを関数の呼び出し側に展開する手法です。  
+本来はコンパイラの最適化の手法ですが、JavaScriptにおいても効果を発揮します。
+
+下記コードをブラウザのコンソール上で実行してみてください。
+
+```js
+const time0 = performance.now()
+
+function powManyTimes (x) { return x * x * x * x * x * x * x * x * x * x * x * x * x  }
+
+for (let i = 0; i < 100000; i++) {
+  powManyTimes(i)
+}
+
+const time1 = performance.now()
+
+console.log(`Before Inline Expansion : Time -> ${time1 - time0} milliseconds.`)
+
+const time2 = performance.now()
+
+for (let j = 0; j < 100000; j++) {
+  j * j * j * j * j * j * j * j * j * j * j * j * j
+}
+
+const time3 = performance.now()
+
+console.log(`After Inline Expansion : Time -> ${time3 - time2} milliseconds.`)
+```
