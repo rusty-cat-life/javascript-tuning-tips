@@ -1,7 +1,22 @@
 # javascript-tuning-tips
 
 ### React
-- shouldComponentUpdate
+- React.memoとshouldComponentUpdate
+
+React.memo（以下memo）はコンポーネントをメモ化し、  
+ウォッチしている変数に変更があったときにメモ化していたコンポーネントを破棄し、  
+再レンダ、再びメモ化します。
+
+[Wikipedia - メモ化](https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%A2%E5%8C%96)
+
+第一引数にコンポーネントを渡し、第2引数に再レンダの判断材料となる情報を渡します。
+
+情報の渡し方は2通りあり、
+
+1. 配列の要素としてウォッチするstate, propsを渡す  
+2. shouldComponentUpdateと同等の関数を渡す
+
+となります。
 
 Reactコンポーネントの再レンダを行うか意思決定をする関数です。  
 boolを返します。
