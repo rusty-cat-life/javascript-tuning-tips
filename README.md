@@ -1,5 +1,7 @@
 # javascript-tuning-tips
 
+# This is WIP
+
 ### React
 - React.memoとshouldComponentUpdate
 
