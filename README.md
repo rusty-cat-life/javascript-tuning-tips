@@ -5,6 +5,8 @@
 ### React
 - React.memoとshouldComponentUpdate
 
+**TL;DR** : 銀の弾丸は無い。performanceAPIでゴリゴリ計測する他ない
+
 React.memo（以下memo）はコンポーネントをメモ化し、  
 ウォッチしている変数に変更があったときにメモ化していたコンポーネントを破棄し、  
 再レンダ、再びメモ化します。
@@ -18,7 +20,8 @@ React.memo（以下memo）はコンポーネントをメモ化し、
 1. 配列の要素としてウォッチするstate, propsを渡す  
 2. shouldComponentUpdateと同等の関数を渡す
 
-となります。
+となります。  
+ちなみに第2引数に何も渡さなかった場合はPureComponent(shallowEqual)と同等の比較によりメモの更新判断がなされます。
 
 Reactコンポーネントの再レンダを行うか意思決定をする関数です。  
 boolを返します。
