@@ -11,14 +11,18 @@ React.memoはコンポーネントを[メモ化](https://ja.wikipedia.org/wiki/%
 再レンダ、再びメモ化します。
 
 第1引数にコンポーネントを渡し、第2引数に**Propsが同一であるかを判断する関数**を渡します。  
-（shouldComponentUpdateでは再レンダを行う際にtrueを返すが、memoでは再レンダを**行わない**際にtrueを返すので注意）
+（shouldComponentUpdateでは再レンダを行う際にtrueを返すが、memoでは再レンダを**行わない**際にtrueを返すので注意）  
 第2引数に何も渡さなかった場合はPureComponent(shallowEqual)と同等の比較によりメモの更新判断がなされます。
 
-要はPureComponentとshouldComponentUpdateがHooksになる上でごっちゃになったコンポーネントです。
+PureComponentとshouldComponentUpdateがFunctional Componentになる上で合体したという理解で大体合ってます。
 
 ```js
 // below two components are same
 class TodoListClassStyle extends React.PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
   render() {
     return (
       <ul>
