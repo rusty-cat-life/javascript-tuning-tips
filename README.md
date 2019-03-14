@@ -164,6 +164,19 @@ const Caaaaaaaaaat = React.memo(({ catName, catAge } : Props) => (
 
 ```
 
+JavaScriptに詳しい方ならご存知だと思うのですが、  
+比較演算子でObjectを比較する際は**オブジェクトが同一のインスタンスであるか**を比較します。  
+つまり**KeyValueが完全に一致していても別インスタンスでは比較演算子は同一でないと判断する**ということです。
+
+```js
+class Hoge {
+  constructor(a, b) { this.a = a; this.b = b }
+}
+
+new Hoge(1, 2) === new Hoge(1, 2) // this will be false!!!
+```
+
+この時点で、shallow equalにネストしたプロパティは渡せないことがわかりました。
 
 __以下wip__
 
