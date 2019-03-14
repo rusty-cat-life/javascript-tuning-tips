@@ -63,8 +63,10 @@ const TodoListFCStyle = React.memo(({ list }) => (
 2. propsがshallow equalで対応しきれる場合
 3. propsがdeep equalする必要がある場合
 
-**※ 以下のパフォーマンス計測は、create-rect-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
+**※ 以下のパフォーマンス計測は、create-react-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
 　 **よって、開発環境での結果と異なる場合があります**
+
+
 
 #### 1.propsがない場合
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
@@ -127,6 +129,41 @@ React.memo    -> 206.68999999179505 milliseconds.
 逆に開発環境では何度やってもSFCのほうが早い様子・・・
 
 ### 結論：本番ではReact.memoしたほうが早い
+
+
+
+#### 2. propsがshallow equalで対応しきれる場合
+[shallow equal](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較を指します。  
+具体的には、オブジェクトの**1段階目**のプロパティの比較を行うものです。
+
+```ts
+type Props = {
+  catName: string
+  catAge: number
+}
+
+const Caaaaaaaaaat = React.memo(({ catName, catAge } : Props) => (
+  <>
+    <h1>My Lovely Cat {'<3'}</h1>
+    <p>Name: {catName}</p>
+    <p>Age: {catAge}</p>
+  </>
+), (prevProps, nextProps) => {
+  // shallow equalの実態
+  // オブジェクトの一段階目のプロパティのみ比較を行う
+  const keys = Object.keys(prevProps)
+  
+  for (const key of keys) {
+    if(prevProps[key] !== nextProps[key]) {
+      return false
+    }
+  }
+  
+  return true
+})
+
+```
+
 
 __以下wip__
 
