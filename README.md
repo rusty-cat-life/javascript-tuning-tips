@@ -1,6 +1,6 @@
 # javascript-tuning-tips
 
-### React
+## React
 
 #### React.memoとコンポーネント単位でのチューニング
 
@@ -158,7 +158,6 @@ const Caaaaaaaaaat = React.memo(({ catName, catAge } : Props) => (
   
   return true
 })
-
 ```
 
 JavaScriptに詳しい方ならご存知だと思うのですが、  
@@ -201,7 +200,7 @@ DOMの再レンダが頻繁に行われるアプリケーション（証券系�
 
 詳細は[githubのレポジトリ](https://github.com/bvaughn/react-virtualized)を参照ください。
 
-### Vanilla JS
+## Vanilla JS
 
 - インライン展開
 
