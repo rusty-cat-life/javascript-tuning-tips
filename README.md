@@ -69,7 +69,10 @@ const TodoListFCStyle = React.memo(({ list }) => (
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
 
 ```js
-const conflictSFC = () => (
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+const ConflictSFC = () => (
   <p>
     conflict歌います。<br />
     ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
@@ -77,7 +80,7 @@ const conflictSFC = () => (
   </p>
 )
 
-const conflictMemo = React.memo(
+const ConflictMemo = React.memo(
   <p>
     conflict歌います。<br />
     ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
@@ -91,7 +94,7 @@ const time0 = performance.now()
 
 for(let i = 0; i < 10000; i++) {
   ReactDOM.render(
-    <conflictSFC />,
+    <ConflictSFC />,
     app
   )
 }
@@ -106,7 +109,7 @@ const time2 = performance.now()
 
 for(let j = 0; j < 10000; j++) {
   ReactDOM.render(
-    <conflictMemo />,
+    <ConflictMemo />,
     app
   )
 }
