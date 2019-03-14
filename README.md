@@ -224,14 +224,15 @@ type TheBrave = {
 冷静になって考えると戦闘中に変化するであろうプロパティは`currentHealth`と`currentMagicPoint`のみです。
 
 ```ts
-const BattleComponent = React.memo(({ theBrave }: { theBrave : TheBrave }) => {
-  // snip
-},
-// p -> prevProps, n -> nextProps
-(p, n) => p.theBrave.currentHealth === n.theBrave.currentHealth && p.theBrave.currentMagicPoint === n.theBrave.currentMagicPoint)
+const BattleComponent = React.memo(
+  ({ theBrave }: { theBrave : TheBrave }) => {
+    // snip
+  },
+  // p -> prevProps, n -> nextProps
+  (p, n) => p.theBrave.currentHealth === n.theBrave.currentHealth &&
+            p.theBrave.currentMagicPoint === n.theBrave.currentMagicPoint
+)
 ```
-
-これで大分すっきりしましたね！  
 必要なプロパティのみ比較しているので、shallow equalやdeep equalより高速なコンポーネントの完成です！
 
 #### まとめ
@@ -260,7 +261,7 @@ DOMの再レンダが頻繁に行われるアプリケーション（証券系�
 下記コードをブラウザのコンソール上で実行してみてください。
 
 ```js
-function powManyTimes (x) { return x * x * x * x * x * x * x * x * x * x * x * x * x  }
+function powManyTimes (x) { x * x * x * x * x * x * x * x * x * x * x * x * x  }
 
 const time0 = performance.now()
 
