@@ -69,8 +69,7 @@ const TodoListFCStyle = React.memo(({ list }) => (
 #### 1.propsがない場合
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
 
-**※ 以下のパフォーマンス計測は、create-react-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
-　 **よって、開発環境での結果と異なる場合があります**
+**※ 以下のパフォーマンス計測は、create-react-appで作成したプロジェクトを`yarn build`したもので計測しています。**
 
 ```js
 import React from 'react'
@@ -125,11 +124,16 @@ console.log(`With React.memo -> ${time3 - time2} milliseconds.`)
 
 SFC Component -> 323.2399999978952 milliseconds.  
 React.memo    -> 206.68999999179505 milliseconds.  
+(Chrome 72)
 
-何度かやりましたがmemo > SFCの関係は変わりませんでした。  
-逆に開発環境では何度やってもSFCのほうが早い様子・・・
+SFC Component -> 786.6 milliseconds.  
+React.memo    -> 849.4 milliseconds.  
+(Edge)
 
-### 結論：本番ではReact.memoしたほうが早い
+ここに関してはブラウザ間の差異が激しすぎる印象です。  
+EdgeもChakra捨ててChromiumに迎合するのでmemoするのも悪くないかもしれないです。
+
+**結論：Chromium系ならmemoが早そう**
 
 #### 2. propsがshallow equalで対応しきれる場合
 [shallow equal](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較を指します。  
