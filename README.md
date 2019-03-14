@@ -119,14 +119,12 @@ const time3 = performance.now()
 console.log(`With React.memo -> ${time3 - time2} milliseconds.`)
 ```
 
-**結果**
-SFC Component 7218.655000004219 milliseconds.
-React.memo 7683.994999999413 milliseconds.
+SFC Component 7218.655000004219 milliseconds.  
+React.memo 7683.994999999413 milliseconds.  
 
-何度かやりましたがやはりSFC > memoの関係は変わりませんでした。
+何度かやりましたがSFC > memoの関係は変わりませんでした。
 
-#### 普通にSFCしたほうが早い
-
+### 結論：普通にSFCしたほうが早い
 
 [shallow-equal(浅い比較)](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較（オブジェクトの1段階のプロパティのみ比較）なので、 
 
