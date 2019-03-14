@@ -63,6 +63,9 @@ const TodoListFCStyle = React.memo(({ list }) => (
 2. propsがshallow equalで対応しきれる場合
 3. propsがdeep equalする必要がある場合
 
+**※ 以下のパフォーマンス計測は、create-rect-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
+　 **よって、開発環境での結果と異なる場合があります**
+
 #### 1.propsがない場合
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
 
@@ -116,12 +119,14 @@ const time3 = performance.now()
 console.log(`With React.memo -> ${time3 - time2} milliseconds.`)
 ```
 
-SFC Component -> 7218.655000004219 milliseconds.  
-React.memo    -> 7683.994999999413 milliseconds.  
+SFC Component -> 323.2399999978952 milliseconds.  
+React.memo    -> 206.68999999179505 milliseconds.  
 
-何度かやりましたがSFC > memoの関係は変わりませんでした。
+何度かやりましたがmemo > SFCの関係は変わりませんでした。
 
-### 結論：普通にSFCしたほうが早い
+但し、開発環境では何度やってもSFCのほうが早い様子・・・
+
+### 結論：React.memoしたほうが早い
 
 __以下wip__
 
