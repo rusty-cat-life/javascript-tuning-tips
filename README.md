@@ -79,45 +79,54 @@ const ConflictSFC = () => (
     プローイユクｗｗｗｗｗｗｗダルフェ スォーイヴォーｗｗｗｗｗスウェンネｗｗｗｗヤットゥ ヴ ヒェンヴガｒジョｊゴアｊガオガオッガｗｗｗじゃｇｊｊ
   </p>
 )
-
-const ConflictMemo = React.memo(
+  
+const ConflictMemo = React.memo(() =>
   <p>
-    conflict歌います。<br />
-    ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
-    プローイユクｗｗｗｗｗｗｗダルフェ スォーイヴォーｗｗｗｗｗスウェンネｗｗｗｗヤットゥ ヴ ヒェンヴガｒジョｊゴアｊガオガオッガｗｗｗじゃｇｊｊ
+      conflict歌います。<br />
+      ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
+      プローイユクｗｗｗｗｗｗｗダルフェ スォーイヴォーｗｗｗｗｗスウェンネｗｗｗｗヤットゥ ヴ ヒェンヴガｒジョｊゴアｊガオガオッガｗｗｗじゃｇｊｊ
   </p>
 , () => true)
-
+  
 const app = document.querySelector('#app')
 
 const time0 = performance.now()
 
 for(let i = 0; i < 10000; i++) {
-  ReactDOM.render(
-    <ConflictSFC />,
-    app
-  )
+    ReactDOM.render(
+        <ConflictSFC />,
+        app
+    )
+    ReactDOM.unmountComponentAtNode(app)
 }
 
 const time1 = performance.now()
 
 console.log(`With Stateless Functional Component -> ${time1 - time0} milliseconds.`)
 
-app.innerHTML = ''
-
 const time2 = performance.now()
 
 for(let j = 0; j < 10000; j++) {
-  ReactDOM.render(
-    <ConflictMemo />,
-    app
-  )
+    ReactDOM.render(
+        <ConflictMemo />,
+        app
+    )
+    ReactDOM.unmountComponentAtNode(app)
 }
 
 const time3 = performance.now()
 
 console.log(`With React.memo -> ${time3 - time2} milliseconds.`)
 ```
+
+**結果**
+SFC Component 7218.655000004219 milliseconds.
+React.memo 7683.994999999413 milliseconds.
+
+何度かやりましたがやはりSFC > memoの関係は変わりませんでした。
+
+#### 普通にSFCしたほうが早い
+
 
 [shallow-equal(浅い比較)](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較（オブジェクトの1段階のプロパティのみ比較）なので、 
 
