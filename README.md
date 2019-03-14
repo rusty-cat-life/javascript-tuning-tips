@@ -54,22 +54,21 @@ const TodoListFCStyle = React.memo(({ list }) => (
 
 ここからが本題で、memoを利用しどうやってチューニングをしていくかの話になります。  
 私はすべてのコンポーネントに同一に適応できるチューニングTipsというのはないと考えていて、  
-**泥臭く各コンポーネントのpropに応じて最善手を選択する**のが現実的なお話になると思います。  
+**各コンポーネントのpropに応じて最善手を選択する**事になると考えています。  
 銀の弾丸なんてなかった。
 
-ただし、最善手の選択アルゴリズムは構築できるのはずなのでそれを書こうと思います。
+そうは言っても、恐らく以下のパターンのどれかに収まるので身構えなくても良かったりします。
 
 1. propsがない場合
 2. propsがshallow equalで対応しきれる場合
-3. propsがdeep equalする必要がある場合
-
-**※ 以下のパフォーマンス計測は、create-react-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
-　 **よって、開発環境での結果と異なる場合があります**
-
-
+3. propsがdeep equalで対応する必要がある場合
+4. そもそも変化しうるプロパティが特定できている場合
 
 #### 1.propsがない場合
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
+
+**※ 以下のパフォーマンス計測は、create-react-appで作成したプロジェクトを`yarn build`したもので計測しています。**  
+　 **よって、開発環境での結果と異なる場合があります**
 
 ```js
 import React from 'react'
@@ -130,8 +129,6 @@ React.memo    -> 206.68999999179505 milliseconds.
 
 ### 結論：本番ではReact.memoしたほうが早い
 
-
-
 #### 2. propsがshallow equalで対応しきれる場合
 [shallow equal](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較を指します。  
 具体的には、オブジェクトの**1段階目**のプロパティの比較を行うものです。
@@ -170,13 +167,14 @@ JavaScriptに詳しい方ならご存知だと思うのですが、
 
 ```js
 class Hoge {
-  constructor(a, b) { this.a = a; this.b = b }
+  constructor(a, b) { this.a = a; this.b = b; }
 }
 
-new Hoge(1, 2) === new Hoge(1, 2) // this will be false!!!
+console.log(new Hoge(1, 2) === new Hoge(1, 2)) // this will be false!!!
 ```
 
-この時点で、shallow equalにネストしたプロパティは渡せないことがわかりました。
+この時点で、shallow equalにネストしたプロパティを渡しても意図した結果にならない事が分かりました。
+但し、shallow equalは以下で紹介するdeep equalより高速であるメリットがあります。
 
 __以下wip__
 
