@@ -8,12 +8,13 @@ React.memoはコンポーネントを[メモ化](https://ja.wikipedia.org/wiki/%
 ウォッチしている変数に変更があったときにメモ化していたコンポーネントを破棄し、  
 再レンダ、再びメモ化します。
 
-第1引数にコンポーネントを渡し、第2引数に**Propsが同一であるかを判断する関数**を渡します。  
-shouldComponentUpdateでは再レンダを行う際にtrueを返すが、  
-memoでは再レンダを**行わない**際にtrueを返すので注意。  
+第1引数にコンポーネントを返す関数を渡し、第2引数に**Propsが同一であるかを判断する関数**を渡します。  
+shouldComponentUpdateでは再レンダを行う際にtrueを返しますが、  
+memoでは再レンダを**行わない**際にtrueを返すので注意が必要です。  
+
 第2引数に何も渡さなかった場合はPureComponent(shallowEqual)と同等の比較によりメモの更新判断がなされます。
 
-PureComponentとshouldComponentUpdateがFunctional Componentになる上で合体したという理解で大体合ってます。
+PureComponentとshouldComponentUpdateがFunctional Componentになる上で合体したという理解で大体OKです。
 
 ```js
 // below two components are same
@@ -50,6 +51,7 @@ const TodoListFCStyle = React.memo(({ list }) => (
 ))
 ```
 
+上が従来の記法、下がmemoを使用した記法です。  
 慣れてしまえばだいぶすっきりした記法ですね。
 
 ここからが本題で、memoを利用しどうやってチューニングをしていくかの話になります。  
@@ -57,7 +59,7 @@ const TodoListFCStyle = React.memo(({ list }) => (
 **各コンポーネントのpropに応じて最善手を選択する**事になると考えています。  
 銀の弾丸なんてなかった。
 
-そうは言っても、恐らく以下のパターンのどれかに収まるので身構えなくても良かったりします。
+そうは言っても、大体以下のパターンのどれかに収まるので身構えなくても良かったりします。
 
 1. propsがない場合
 2. propsがshallow equalで対応しきれる場合
@@ -135,15 +137,16 @@ React.memo    -> 206.68999999179505 milliseconds.
 
 ```ts
 type Props = {
-  catName: string
-  catAge: number
+  name: string
+  age: number
 }
 
-const Caaaaaaaaaat = React.memo(({ catName, catAge } : Props) => (
+// below two components works same
+const MyLovelyCat = React.memo(({ name, age } : Props) => (
   <>
     <h1>My Lovely Cat {'<3'}</h1>
-    <p>Name: {catName}</p>
-    <p>Age: {catAge}</p>
+    <p>Name: {name}</p>
+    <p>Age: {age}</p>
   </>
 ), (prevProps, nextProps) => {
   // shallow equalの実態
@@ -158,6 +161,14 @@ const Caaaaaaaaaat = React.memo(({ catName, catAge } : Props) => (
   
   return true
 })
+
+const MyLovelyCaaaaaaaaat = React.memo(({ name, age } : Props) => (
+  <>
+    <h1>My Lovely Cat {'<3'}</h1>
+    <p>Name: {name}</p>
+    <p>Age: {age}</p>
+  </>
+))
 ```
 
 JavaScriptに詳しい方ならご存知だと思うのですが、  
@@ -169,28 +180,68 @@ class Hoge {
   constructor(a, b) { this.a = a; this.b = b; }
 }
 
-console.log(new Hoge(1, 2) === new Hoge(1, 2)) // this will be false!!!
+console.log(new Hoge(1, 2) === new Hoge(1, 2)) // This will be false!!!
 ```
 
 この時点で、shallow equalにネストしたプロパティを渡しても意図した結果にならない事が分かりました。  
-但し、shallow equalは以下で紹介するdeep equalより高速であるメリットがあります。
+ネストしたプロパティまで対応したい場合、deep equalの出番です。  
+但し、shallow equalはdeep equalより高速であることを忘れないでください。
 
 #### 3. propsがdeep equalで対応する必要がある場合
 ネストしたオブジェクトをpropsに持つ場合にはdeep equalの出番です。  
 再帰的にオブジェクトのプロパティを比較します。  
 但し、ここで紹介する方法の中で最も遅くなることを留意してください。  
 もし変化しうるプロパティを分かりきっている場合は、**4. 変化しうるプロパティが特定できている場合**の実装を優先してください。  
-deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳う[fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal)を選定します。
+deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳う[fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal)を使用します。
 
 ```js
 import equal from 'fast-deep-equal'
 
-const SomeComponent = React.memo(props => (
+const ComponentWithDeepEqual = React.memo(props => (
 // snip
 ), (prev, next) => equal(prev, next))
 ```
 
 #### 4. 変化しうるプロパティが特定できている場合
+もし**特定のプロパティが変化した時だけメモを更新する**のであれば  
+自分で更新を判定する関数をカスタマイズして対応することがベストプラクティスになります。
+
+```ts
+type TheBrave = {
+  name: string
+  gender: string
+  equips: Equips
+  maxHealth: number
+  currentHealth: number
+  maxMagicPoint: number
+  currentMagicPoint: number
+}
+```
+
+例えばこんなプロパティを持つ勇者が居たとしましょう。  
+そしてあなたは戦闘中に何度も更新されるコンポーネントを実装することになったとします。  
+`Equips`がオブジェクトであろうので、deep equalが適切かと思いますが、  
+冷静になって考えると戦闘中に変化するであろうプロパティは`currentHealth`と`currentMagicPoint`のみです。
+
+```ts
+const BattleComponent = React.memo(({ theBrave }: { theBrave : TheBrave }) => {
+  // snip
+},
+// p -> prevProps, n -> nextProps
+(p, n) => p.theBrave.currentHealth === n.theBrave.currentHealth && p.theBrave.currentMagicPoint === n.theBrave.currentMagicPoint)
+```
+
+これで大分すっきりしましたね！  
+必要なプロパティのみ比較しているので、shallow equalやdeep equalより高速なコンポーネントの完成です！
+
+#### まとめ
+a. propsがあるか？ Yes -> b. No -> 1.  
+b. 特定のプロパティだけ気にすればいいか？ Yes -> 4. No -> c.  
+c. ネストしたプロパティがあるか？ Yes -> 3. No -> 2.
+
+チューニングに関する知見は正直あまりこれ！という決定版が見つからないのでとりあえず自分の持っている知見を全放出しました。  
+あくまで一人が調べた結果でしかないので改善の余地があるかと思います。  
+ﾌﾛﾝﾄｴﾝﾄﾞﾂﾖｲｵｼﾞｻﾝの議論の話題になれば・・・！
 
 ## react-virtualized
 
