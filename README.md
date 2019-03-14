@@ -65,6 +65,57 @@ const TodoListFCStyle = React.memo(({ list }) => (
 2. propsがshallow equalで対応しきれる場合
 3. propsがdeep equalする必要がある場合
 
+#### 1.propsがない場合
+この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
+
+```js
+const conflictSFC = () => (
+  <p>
+    conflict歌います。<br />
+    ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
+    プローイユクｗｗｗｗｗｗｗダルフェ スォーイヴォーｗｗｗｗｗスウェンネｗｗｗｗヤットゥ ヴ ヒェンヴガｒジョｊゴアｊガオガオッガｗｗｗじゃｇｊｊ
+  </p>
+)
+
+const conflictMemo = React.memo(
+  <p>
+    conflict歌います。<br />
+    ズォールヒ～～↑ｗｗｗｗヴィヤーンタースｗｗｗｗｗワース フェスツｗｗｗｗｗｗｗルオルｗｗｗｗｗ
+    プローイユクｗｗｗｗｗｗｗダルフェ スォーイヴォーｗｗｗｗｗスウェンネｗｗｗｗヤットゥ ヴ ヒェンヴガｒジョｊゴアｊガオガオッガｗｗｗじゃｇｊｊ
+  </p>
+, () => true)
+
+const app = document.querySelector('#app')
+
+const time0 = performance.now()
+
+for(let i = 0; i < 10000; i++) {
+  ReactDOM.render(
+    <conflictSFC />,
+    app
+  )
+}
+
+const time1 = performance.now()
+
+console.log(`With Stateless Functional Component -> ${time1 - time0} milliseconds.`)
+
+app.innerHTML = ''
+
+const time2 = performance.now()
+
+for(let j = 0; j < 10000; j++) {
+  ReactDOM.render(
+    <conflictMemo />,
+    app
+  )
+}
+
+const time3 = performance.now()
+
+console.log(`With React.memo -> ${time3 - time2} milliseconds.`)
+```
+
 [shallow-equal(浅い比較)](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較（オブジェクトの1段階のプロパティのみ比較）なので、 
 
 よって、**deep-equal**を使用します。  
