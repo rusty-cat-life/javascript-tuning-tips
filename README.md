@@ -3,25 +3,45 @@
 # javascript-tuning-tips
 
 ### React
-- React.memoとshouldComponentUpdate
 
-**TL;DR** : 銀の弾丸は無い。performanceAPIでゴリゴリ計測する他ない
+#### React.memoとshouldComponentUpdate
 
-React.memo（以下memo）はコンポーネントをメモ化し、  
+React.memoはコンポーネントを[メモ化](https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%A2%E5%8C%96)し、  
 ウォッチしている変数に変更があったときにメモ化していたコンポーネントを破棄し、  
 再レンダ、再びメモ化します。
 
-[Wikipedia - メモ化](https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%A2%E5%8C%96)
+第1引数にコンポーネントを渡し、第2引数に**Propsが同一であるかを判断する関数**を渡します。  
+（shouldComponentUpdateでは再レンダを行う際にtrueを返すが、memoでは再レンダを**行わない**際にtrueを返すので注意）
+第2引数に何も渡さなかった場合はPureComponent(shallowEqual)と同等の比較によりメモの更新判断がなされます。
 
-第一引数にコンポーネントを渡し、第2引数に再レンダの判断材料となる情報を渡します。
+要はPureComponentとshouldComponentUpdateがHooksになる上でごっちゃになったコンポーネントです。
 
-情報の渡し方は2通りあり、
+```js
+// below two components are same
+class TodoListClassStyle extends React.PureComponent {
+  render() {
+    return (
+      <ul>
+        { this.props.list.map((item, index) => (
+          <li key={index}>
+            { item }
+          </li>
+        )) }
+      </ul>
+    )
+  }
+}
 
-1. 配列の要素としてウォッチするstate, propsを渡す  
-2. shouldComponentUpdateと同等の関数を渡す
-
-となります。  
-ちなみに第2引数に何も渡さなかった場合はPureComponent(shallowEqual)と同等の比較によりメモの更新判断がなされます。
+const TodoListFCStyle = React.memo(({ list }) => (
+  <ul>
+    { list.map((item, index) => (
+      <li key={index}>
+        { item }
+      </li>
+    )) }
+  </ul>
+))
+```
 
 Reactコンポーネントの再レンダを行うか意思決定をする関数です。  
 boolを返します。
