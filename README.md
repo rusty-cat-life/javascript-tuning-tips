@@ -62,7 +62,7 @@ const TodoListFCStyle = React.memo(({ list }) => (
 1. propsがない場合
 2. propsがshallow equalで対応しきれる場合
 3. propsがdeep equalで対応する必要がある場合
-4. そもそも変化しうるプロパティが特定できている場合
+4. 変化しうるプロパティが特定できている場合
 
 #### 1.propsがない場合
 この場合は`() => true`なmemoか、普通のSFCが早いかの比較になります。計測しましょう。
@@ -172,28 +172,27 @@ class Hoge {
 console.log(new Hoge(1, 2) === new Hoge(1, 2)) // this will be false!!!
 ```
 
-この時点で、shallow equalにネストしたプロパティを渡しても意図した結果にならない事が分かりました。
+この時点で、shallow equalにネストしたプロパティを渡しても意図した結果にならない事が分かりました。  
 但し、shallow equalは以下で紹介するdeep equalより高速であるメリットがあります。
 
-__以下wip__
+#### 3. propsがdeep equalで対応する必要がある場合
+ネストしたオブジェクトをpropsに持つ場合にはdeep equalの出番です。  
+再帰的にオブジェクトのプロパティを比較します。  
+但し、ここで紹介する方法の中で最も遅くなることを留意してください。  
+もし変化しうるプロパティを分かりきっている場合は、**4. 変化しうるプロパティが特定できている場合**の実装を優先してください。  
+deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳う[fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal)を選定します。
 
-[shallow-equal(浅い比較)](https://efcl.info/2017/11/30/shallow-equal/)はその名の通り浅い比較（オブジェクトの1段階のプロパティのみ比較）なので、 
-
-よって、**deep-equal**を使用します。  
-deep-equalはshallow-equalより低速であるというデメリットはありますが、  
-再帰的にネストしたプロパティまで比較してくれるのが特徴です。  
-deep-equalライブラリはdeep-equal系ライブラリの中で最速を謳っている[fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal)を選定しました。
-
-```javascript
+```js
 import equal from 'fast-deep-equal'
 
-/* snip */
-shouldComponentUpdate(nextProps, nextState) {
-  return !equal(this.props, nextProps) || !equal(this.state, nextState)
-}
+const SomeComponent = React.memo(props => (
+// snip
+), (prev, next) => equal(prev, next))
 ```
 
-- react-virtualized
+#### 4. 変化しうるプロパティが特定できている場合
+
+## react-virtualized
 
 画面表示範囲外のDOMを描画しないことにより、DOMの再レンダコストを下げるライブラリです。  
 DOMの再レンダが頻繁に行われるアプリケーション（証券系、カレンダー、スプレッドシートetc...）で効果を発揮します。
